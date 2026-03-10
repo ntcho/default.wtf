@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Google Account Switcher
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
 // @description  Switch Google accounts using Option + 1-9 on macOS.
 // @author       You
 // @match        *://*.google.com/*
@@ -63,12 +63,6 @@
 
     // Prevent reloading if the url is already on the target user index
     if (isTargetUPath || isTargetAuthUser) {
-      return null;
-    }
-
-    // If no explicit account indicator is present, Google defaults to account index 0.
-    // Prevent a redundant reload if the target is also index 0.
-    if (!currentUPathMatch && !currentAuthUser && targetIndex === 0) {
       return null;
     }
 
