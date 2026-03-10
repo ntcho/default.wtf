@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Google Account Switcher
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @description  Switch Google accounts using Option + 1-9 on macOS.
 // @author       You
 // @match        *://*.google.com/*
@@ -93,6 +93,13 @@
     ];
 
     if (uPathDomains.includes(url.hostname)) {
+      // Explicit support for Google Docs /d/ URLs
+      if (url.hostname === 'docs.google.com' && path.includes('/d/')) {
+        url.pathname = path.replace('/d/', `/u/${targetIndex}/d/`);
+        url.pathname = url.pathname.replace(/\/{2,}/g, '/');
+        return url.toString();
+      }
+
       const segments = path.split('/').filter(Boolean);
 
       if (url.hostname === 'myaccount.google.com' || segments.length === 0) {
