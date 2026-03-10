@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Google Account Switcher
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @version      1.0.1
 // @description  Switch Google accounts using Option + 1-9 on macOS.
 // @author       You
 // @match        *://*.google.com/*
@@ -57,12 +57,19 @@
     const currentUPathMatch = path.match(/\/u\/(\d+)/);
     const currentAuthUser = url.searchParams.get('authuser');
 
-    if (currentUPathMatch && parseInt(currentUPathMatch[1], 10) === targetIndex) {
-      return null; // Already on the correct /u/ path
+    const isTargetUPath =
+      currentUPathMatch && parseInt(currentUPathMatch[1], 10) === targetIndex;
+    const isTargetAuthUser = currentAuthUser === targetIndex.toString();
+
+    // Prevent reloading if the url is already on the target user index
+    if (isTargetUPath || isTargetAuthUser) {
+      return null;
     }
 
-    if (!currentUPathMatch && currentAuthUser === targetIndex.toString()) {
-      return null; // Already on the correct authuser query
+    // If no explicit account indicator is present, Google defaults to account index 0.
+    // Prevent a redundant reload if the target is also index 0.
+    if (!currentUPathMatch && !currentAuthUser && targetIndex === 0) {
+      return null;
     }
 
     // Strategy 1: If the URL already contains a /u/{N} segment, replace it.
